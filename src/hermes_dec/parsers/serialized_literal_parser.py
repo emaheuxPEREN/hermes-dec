@@ -53,6 +53,13 @@ class TagType(IntEnum):
     ShortStringTag = 5
     ByteStringTag = 6
     IntegerTag = 7
+    # Not a raw on-disk tag value (those only span 0-7, see the 0b111 mask
+    # below): starting with Hermes Static bytecode version 98, raw tag 6 was
+    # repurposed from ByteStringTag (a 1-byte string index payload) to
+    # UndefinedTag (no payload at all). unpack_slp_array() re-tags matching
+    # items to this synthetic value when bytecode_version >= 98 so the two
+    # cases can be told apart below.
+    UndefinedTag = 8
 
 
 @dataclass
@@ -84,6 +91,8 @@ class SLPArray:
                 TagType.ByteStringTag,
             ):
                 string = repr(string_table[item.value])
+            elif item.tag_type == TagType.UndefinedTag:
+                string = 'undefined'
             elif item.tag_type == TagType.IntegerTag:
                 string = str(item.value)
             else:
@@ -94,7 +103,9 @@ class SLPArray:
         return stringified_items
 
 
-def unpack_slp_array(data: bytes, num_items: int) -> SLPArray:
+def unpack_slp_array(
+    data: bytes, num_items: int, bytecode_version: int = 0
+) -> SLPArray:
     data = BytesIO(data)
 
     items = []
@@ -111,6 +122,12 @@ def unpack_slp_array(data: bytes, num_items: int) -> SLPArray:
         else:
             length = next_tag[0] & 0b1111
 
+        # Starting with Hermes Static bytecode version 98, raw tag 6 no
+        # longer means ByteStringTag (1-byte string index) - it was
+        # repurposed to mean UndefinedTag (no payload bytes at all).
+        if tag_type == TagType.ByteStringTag and bytecode_version >= 98:
+            tag_type = TagType.UndefinedTag
+
         for item in range(length):
             if tag_type == TagType.NullTag:
                 values.append(None)
@@ -118,6 +135,8 @@ def unpack_slp_array(data: bytes, num_items: int) -> SLPArray:
                 values.append(True)
             elif tag_type == TagType.FalseTag:
                 values.append(False)
+            elif tag_type == TagType.UndefinedTag:
+                values.append(None)
             elif tag_type == TagType.NumberTag:
                 values.append(unpack('<d', data.read(8))[0])
             elif tag_type == TagType.LongStringTag:

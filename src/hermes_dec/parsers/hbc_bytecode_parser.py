@@ -115,6 +115,7 @@ class ParsedInstruction:
                         else self.hbc_reader.literal_values
                     )[self.arg4 :],
                     self.arg3,
+                    self.hbc_reader.header.version,
                 ).to_strings(self.hbc_reader.strings)
             )
         elif self.inst.name in (
@@ -126,11 +127,14 @@ class ParsedInstruction:
                     '%s: %s' % (key, value)
                     for key, value in zip(
                         unpack_slp_array(
-                            self.hbc_reader.object_keys[self.arg4 :], self.arg3
+                            self.hbc_reader.object_keys[self.arg4 :],
+                            self.arg3,
+                            self.hbc_reader.header.version,
                         ).to_strings(self.hbc_reader.strings),
                         unpack_slp_array(
                             (self.hbc_reader.object_values)[self.arg5 :],
                             self.arg3,
+                            self.hbc_reader.header.version,
                         ).to_strings(self.hbc_reader.strings),
                     )
                 )
@@ -143,6 +147,7 @@ class ParsedInstruction:
                         unpack_slp_array(
                             (self.hbc_reader.literal_values)[self.arg3 :],
                             len(shape_keys),
+                            self.hbc_reader.header.version,
                         ).to_strings(self.hbc_reader.strings),
                     )
                 )
