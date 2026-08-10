@@ -746,6 +746,8 @@ _name_to_instruction: Dict[str, Instruction] = {
 }
 
 _builtin_function_names: List[str] = [
+    'globalThis.Symbol',
+    'globalThis.eval',
     'Array.isArray',
     'Date.UTC',
     'Date.parse',

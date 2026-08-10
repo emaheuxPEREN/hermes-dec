@@ -50,6 +50,7 @@ def main():
                     'BUILTIN_METHOD',
                     'PRIVATE_BUILTIN',
                     'JS_BUILTIN',
+                    'NORMAL_METHOD',
                 ):
                     operands = line.split('(')[1].split(')')[0].split(', ')
                     builtin_function_names.append('.'.join(operands))
