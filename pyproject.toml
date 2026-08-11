@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hermes-dec"
-version = "0.1.6"
+version = "0.1.7"
 authors = [
     {name = "P1 Security - Marin Moulinier"},
 ]
@@ -27,9 +27,11 @@ classifiers = [
 license = "AGPL-3.0-or-later"
 license-files = ["LICENSE"]
 
-[project.optional-dependencies]
-codegen = ["clang==12.0.1"]
-test = [ "pytest==9.0.3" ]
+[dependency-groups]
+dev = [
+    "clang==18.1.8",
+    "pytest==9.0.3"
+]
 
 
 [project.urls]
