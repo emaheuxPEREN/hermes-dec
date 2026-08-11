@@ -1644,6 +1644,7 @@ def pass2_transform_code(
                         else state.hbc_reader.literal_values
                     )[op4:],
                     op3,
+                    state.hbc_reader.header.version,
                 ).to_strings(state.hbc_reader.strings)
             )
             lines.append(
@@ -1662,11 +1663,14 @@ def pass2_transform_code(
                     '%s: %s' % (key, value)
                     for key, value in zip(
                         unpack_slp_array(
-                            state.hbc_reader.object_keys[op4:], op3
+                            state.hbc_reader.object_keys[op4:],
+                            op3,
+                            state.hbc_reader.header.version,
                         ).to_strings(state.hbc_reader.strings),
                         unpack_slp_array(
                             (state.hbc_reader.object_values)[op5:],
                             op3,
+                            state.hbc_reader.header.version,
                         ).to_strings(state.hbc_reader.strings),
                     )
                 )
@@ -1679,6 +1683,7 @@ def pass2_transform_code(
                         unpack_slp_array(
                             (state.hbc_reader.literal_values)[op3:],
                             len(shape_keys),
+                            state.hbc_reader.header.version,
                         ).to_strings(state.hbc_reader.strings),
                     )
                 )
@@ -1694,6 +1699,7 @@ def pass2_transform_code(
                     unpack_slp_array(
                         state.hbc_reader.literal_values[op4:],
                         len(shape_keys),
+                        state.hbc_reader.header.version,
                     ).to_strings(state.hbc_reader.strings),
                 )
             )
@@ -1725,6 +1731,7 @@ def pass2_transform_code(
                     unpack_slp_array(
                         state.hbc_reader.literal_values[op4:],
                         len(shape_keys),
+                        state.hbc_reader.header.version,
                     ).to_strings(state.hbc_reader.strings),
                 )
             )

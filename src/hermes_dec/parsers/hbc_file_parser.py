@@ -840,6 +840,7 @@ class HBCReader:
                 unpack_slp_array(
                     self.object_keys[entry.key_buffer_offset :],
                     entry.num_props,
+                    self.header.version,
                 ).to_strings(self.strings)
                 for entry in shape_table_entries
             ]

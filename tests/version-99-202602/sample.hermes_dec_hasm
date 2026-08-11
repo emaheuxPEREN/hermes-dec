@@ -62,7 +62,7 @@ Bytecode listing:
 ==> 00000002: <LoadConstUndefined>: <Reg8: 1>
 ==> 00000004: <ReifyArgumentsLoose>: <Reg8: 1>
 ==> 00000006: <Mov>: <Reg8: 4, Reg8: 1>
-==> 00000009: <GetBuiltinClosure>: <Reg8: 3, UInt8: 57>  # Built-in function: [#57 awaitAsyncGenerator]
+==> 00000009: <GetBuiltinClosure>: <Reg8: 3, UInt8: 57>  # Built-in function: [#57 spawnAsync]
 ==> 0000000c: <GetParentEnvironment>: <Reg8: 1, UInt8: 0>
 ==> 0000000f: <CreateClosure>: <Reg8: 2, Reg8: 1, function_id: 4>  # Function: [#4 ?anon_0_testx of 27 bytes]: 2 params @ offset 0x000004d4
 ==> 00000014: <LoadThisNS>: <Reg8: 1>
@@ -210,7 +210,7 @@ Bytecode listing:
 ==> 0000010b: <StoreNPToEnvironment>: <Reg8: 1, UInt8: 3, Reg8: 16>
 ==> 0000010f: <Mov>: <Reg8: 2, Reg8: 7>
 ==> 00000112: <StoreNPToEnvironment>: <Reg8: 1, UInt8: 4, Reg8: 7>
-==> 00000116: <NewObjectWithBuffer>: <Reg8: 18, UInt16: 0, UInt16: 2>  # Object: {'value': 'xy', 'done': 42}
+==> 00000116: <NewObjectWithBuffer>: <Reg8: 18, UInt16: 0, UInt16: 2>  # Object: {'value': undefined, 'done': true}
 ==> 0000011c: <Ret>: <Reg8: 18>
 ==> 0000011e: <Mov>: <Reg8: 2, Reg8: 7>
 ==> 00000121: <StoreNPToEnvironment>: <Reg8: 1, UInt8: 4, Reg8: 7>
@@ -255,7 +255,7 @@ Bytecode listing:
 ==> 000001b6: <Throw>: <Reg8: 6>
 ==> 000001b8: <JStrictEqual>: <Addr8: 28, Reg8: 3, Reg8: 5>  # Address: 000001d4
 ==> 000001bc: <JStrictEqual>: <Addr8: 12, Reg8: 3, Reg8: 4>  # Address: 000001c8
-==> 000001c0: <NewObjectWithBuffer>: <Reg8: 3, UInt16: 0, UInt16: 2>  # Object: {'value': 'xy', 'done': 42}
+==> 000001c0: <NewObjectWithBuffer>: <Reg8: 3, UInt16: 0, UInt16: 2>  # Object: {'value': undefined, 'done': true}
 ==> 000001c6: <Ret>: <Reg8: 3>
 ==> 000001c8: <NewObjectWithBuffer>: <Reg8: 3, UInt16: 0, UInt16: 0>  # Object: {'value': null, 'done': true}
 ==> 000001ce: <PutOwnBySlotIdx>: <Reg8: 3, Reg8: 0, UInt8: 0>
@@ -265,7 +265,7 @@ Bytecode listing:
 ==> 000001d9: <Mov>: <Reg8: 2, Reg8: 0>
 ==> 000001dc: <StoreNPToEnvironment>: <Reg8: 1, UInt8: 4, Reg8: 0>
 ==> 000001e0: <LoadConstString>: <Reg8: 23, string_id: 4>  # String: 'Generator functions may not be called on executing generators' (String)
-==> 000001e4: <CallBuiltin>: <Reg8: 0, UInt8: 44, UInt8: 2>  # Built-in function: [#44 copyDataProperties]
+==> 000001e4: <CallBuiltin>: <Reg8: 0, UInt8: 44, UInt8: 2>  # Built-in function: [#44 throwTypeError]
 ==> 000001e8: <Unreachable>: <>
 
 
@@ -328,7 +328,7 @@ Bytecode listing:
 ==> 00000075: <Call2>: <Reg8: 7, Reg8: 8, Reg8: 9, Reg8: 7>
 ==> 0000007a: <Mov>: <Reg8: 2, Reg8: 6>
 ==> 0000007d: <StoreNPToEnvironment>: <Reg8: 1, UInt8: 3, Reg8: 6>
-==> 00000081: <NewObjectWithBuffer>: <Reg8: 7, UInt16: 0, UInt16: 2>  # Object: {'value': 'xy', 'done': 42}
+==> 00000081: <NewObjectWithBuffer>: <Reg8: 7, UInt16: 0, UInt16: 2>  # Object: {'value': undefined, 'done': true}
 ==> 00000087: <Ret>: <Reg8: 7>
 ==> 00000089: <Mov>: <Reg8: 2, Reg8: 6>
 ==> 0000008c: <StoreNPToEnvironment>: <Reg8: 1, UInt8: 3, Reg8: 6>
@@ -395,7 +395,7 @@ Bytecode listing:
 ==> 0000016b: <LoadConstUInt8>: <Reg8: 5, UInt8: 1>
 ==> 0000016e: <JStrictEqual>: <Addr8: 28, Reg8: 3, Reg8: 5>  # Address: 0000018a
 ==> 00000172: <JStrictEqual>: <Addr8: 12, Reg8: 3, Reg8: 4>  # Address: 0000017e
-==> 00000176: <NewObjectWithBuffer>: <Reg8: 3, UInt16: 0, UInt16: 2>  # Object: {'value': 'xy', 'done': 42}
+==> 00000176: <NewObjectWithBuffer>: <Reg8: 3, UInt16: 0, UInt16: 2>  # Object: {'value': undefined, 'done': true}
 ==> 0000017c: <Ret>: <Reg8: 3>
 ==> 0000017e: <NewObjectWithBuffer>: <Reg8: 3, UInt16: 0, UInt16: 0>  # Object: {'value': null, 'done': true}
 ==> 00000184: <PutOwnBySlotIdx>: <Reg8: 3, Reg8: 0, UInt8: 0>
@@ -405,7 +405,7 @@ Bytecode listing:
 ==> 0000018f: <Mov>: <Reg8: 2, Reg8: 0>
 ==> 00000192: <StoreNPToEnvironment>: <Reg8: 1, UInt8: 3, Reg8: 0>
 ==> 00000196: <LoadConstString>: <Reg8: 11, string_id: 4>  # String: 'Generator functions may not be called on executing generators' (String)
-==> 0000019a: <CallBuiltin>: <Reg8: 0, UInt8: 44, UInt8: 2>  # Built-in function: [#44 copyDataProperties]
+==> 0000019a: <CallBuiltin>: <Reg8: 0, UInt8: 44, UInt8: 2>  # Built-in function: [#44 throwTypeError]
 ==> 0000019e: <Unreachable>: <>
 
 

@@ -7,7 +7,7 @@ r4 = async function(a0) { // Original name: testx, environment: r3
     r1 = undefined;
     r1 = arguments;
     r4 = r1;
-    r3 = awaitAsyncGenerator;
+    r3 = spawnAsync;
     r2 = function* (a0) { // Original name: ?anon_0_testx, environment: r1
         r2 = a0;
         var _closure1_slot0 = r2;
@@ -54,7 +54,7 @@ case 74:
                 r2 = r6;
                 _closure1_slot3 = r6;
 case 129: // try_end0
-                r7 = {'value': 'xy', 'done': 42};
+                r7 = {'value': undefined, 'done': true};
                 return r7;
 case 137: // try_start_1
                 r2 = r6;
@@ -141,7 +141,7 @@ case 363:
 case 370:
                 if(!(r3 !== r4)) { _fun7_ip = 382; continue _fun7 }
 case 374:
-                r3 = {'value': 'xy', 'done': 42};
+                r3 = {'value': undefined, 'done': true};
                 return r3;
 case 382:
                 r3 = {'value': null, 'done': true};
@@ -154,7 +154,7 @@ case 396:
                 r2 = r0;
                 _closure1_slot3 = r0;
                 r11 = 'Generator functions may not be called on executing generators';
-                r0 = copyDataProperties(r12);
+                r0 = throwTypeError(r12);
                 // Unreachable position reached: 0000019e: <Unreachable>: <>;
             }
         };
@@ -257,7 +257,7 @@ case 271:
             r2 = r7;
             _closure1_slot4 = r7;
 case 278: // try_end0
-            r18 = {'value': 'xy', 'done': 42};
+            r18 = {'value': undefined, 'done': true};
             return r18;
 case 286: // try_start_1
             r2 = r7;
@@ -321,7 +321,7 @@ case 440:
 case 444:
             if(!(r3 !== r4)) { _fun5_ip = 456; continue _fun5 }
 case 448:
-            r3 = {'value': 'xy', 'done': 42};
+            r3 = {'value': undefined, 'done': true};
             return r3;
 case 456:
             r3 = {'value': null, 'done': true};
@@ -334,7 +334,7 @@ case 470:
             r2 = r0;
             _closure1_slot4 = r0;
             r23 = 'Generator functions may not be called on executing generators';
-            r0 = copyDataProperties(r24);
+            r0 = throwTypeError(r24);
             // Unreachable position reached: 000001e8: <Unreachable>: <>;
         }
     };
