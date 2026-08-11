@@ -4,7 +4,7 @@ from re import search, match, findall, sub, finditer, MULTILINE, DOTALL
 from typing import List, Dict, Set, Sequence, Union, Optional, Any
 from dataclasses import dataclass
 
-from clang.cindex import Index, CursorKind
+from clang.cindex import Index, CursorKind, Config
 
 """
     This file contains transitory libclang-based code
@@ -17,6 +17,8 @@ from clang.cindex import Index, CursorKind
     
     It is a scratchpad.
 """
+
+Config.set_library_file('libclang-18.so.1')
 
 
 @dataclass
@@ -98,7 +100,7 @@ def find_typerefs(
 
 
 # INPUT_FILE_NAME = '/home/marin/hermes/include/hermes/Regex/RegexBytecode.h'
-INPUT_FILE_NAME = '/home/marin/hermes-dec/src/hermes_dec/parsers/original_regex_bytecode_c_src/RegexBytecode-v0.12.0.h'
+INPUT_FILE_NAME = '/home/marin/hermes-dec/src/hermes_dec/utils/original_regex_bytecode_c_src/RegexBytecode-v0.12.0.h'
 # INPUT_FILE_NAME = '/home/marin/hermes-dec/src/hermes_dec/parsers/original_regex_bytecode_c_src/RegexBytecode-v0.0.1.h'
 
 

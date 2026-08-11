@@ -12,7 +12,7 @@ rm -f original_hermes_bytecode_c_src/*.h
 ./original_hermes_bytecode_c_src/get_source_codes.sh
 ./original_function_builtins_c_src/get_source_codes.sh
 
-./hermes_bytecode_structs_parser.py
+uv run ./hermes_bytecode_structs_parser.py
 
 cd ..
 ruff format

@@ -1,10 +1,9 @@
 /*
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the MIT license found in the LICENSE
+ * file in the root directory of this source tree.
  */
-
 #ifndef HERMES_REGEX_REGEXBYTECODE_H
 #define HERMES_REGEX_REGEXBYTECODE_H
 
@@ -43,8 +42,6 @@ struct Insn {
 struct GoalInsn : public Insn {};
 struct LeftAnchorInsn : public Insn {};
 struct RightAnchorInsn : public Insn {};
-struct MatchAnyInsn : public Insn {};
-struct U16MatchAnyInsn : public Insn {};
 struct MatchAnyButNewlineInsn : public Insn {};
 struct U16MatchAnyButNewlineInsn : public Insn {};
 struct MatchChar8Insn : public Insn {

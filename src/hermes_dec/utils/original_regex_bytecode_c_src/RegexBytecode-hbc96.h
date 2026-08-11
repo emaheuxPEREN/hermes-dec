@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,12 +8,16 @@
 #ifndef HERMES_REGEX_REGEXBYTECODE_H
 #define HERMES_REGEX_REGEXBYTECODE_H
 
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/Support/Casting.h"
+#include "llvh/ADT/DenseMap.h"
+#include "llvh/Support/Casting.h"
 
 #include <cstdint>
 #include <vector>
+#pragma GCC diagnostic push
 
+#ifdef HERMES_COMPILER_SUPPORTS_WSHORTEN_64_TO_32
+#pragma GCC diagnostic ignored "-Wshorten-64-to-32"
+#endif
 namespace hermes {
 namespace regex {
 
@@ -196,8 +200,8 @@ struct BeginLoopInsn : public Insn {
   uint32_t max;
 
   /// Range of marked subexpressions enclosed by the loop, as [begin, end).
-  uint32_t mexpBegin;
-  uint32_t mexpEnd;
+  uint16_t mexpBegin;
+  uint16_t mexpEnd;
 
   /// Whether the loop is greedy (i.e. * instead of *?)
   bool greedy;
@@ -292,7 +296,8 @@ class RegexBytecodeStream {
   /// Whether our bytecode has been acquired.
   bool acquired_ = false;
 
-  /// Private type acting as a reallocation-safe pointer to an instruction.
+ public:
+  /// Type acting as a reallocation-safe pointer to an instruction.
   /// This stores a pointer to the vector and an offset, rather than a pointer
   /// into the vector contents.
   template <typename Instruction>
@@ -303,14 +308,13 @@ class RegexBytecodeStream {
    public:
     Instruction *operator->() {
       Insn *base = reinterpret_cast<Insn *>(&bytes_->at(offset_));
-      return llvm::cast<Instruction>(base);
+      return llvh::cast<Instruction>(base);
     }
 
     InstructionWrapper(std::vector<uint8_t> *bytes, uint32_t offset)
         : bytes_(bytes), offset_(offset) {}
   };
 
- public:
   /// Emit an instruction.
   /// \return a dereferenceable "pointer" to the instruction in the bytecode
   /// stream.
@@ -357,7 +361,7 @@ class RegexBytecodeStream {
 } // namespace regex
 } // namespace hermes
 
-namespace llvm {
+namespace llvh {
 /// LLVM RTTI implementation for regex instructions. Rather than defining
 /// classof() for each instruction struct, which would require a lot of
 /// error-prone boilerplate, we take the Casting.h header's suggestion of
@@ -374,5 +378,7 @@ struct isa_impl<
     return val.opcode == hermes::regex::OpcodeFor<To>::value;
   }
 };
-} // namespace llvm
+} // namespace llvh
+#pragma GCC diagnostic pop
+
 #endif // HERMES_REGEX_REGEXBYTECODE_H

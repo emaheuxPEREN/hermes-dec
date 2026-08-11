@@ -9,7 +9,7 @@ rm -f original_regex_bytecode_c_src/*.h
 
 ./original_regex_bytecode_c_src/get_source_codes.sh
 
-./regex_bytecode_structs_parser.py
+uv run ./regex_bytecode_structs_parser.py
 
 cd ..
 ruff format

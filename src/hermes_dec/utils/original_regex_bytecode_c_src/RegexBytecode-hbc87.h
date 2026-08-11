@@ -1,14 +1,15 @@
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
- * This source code is licensed under the MIT license found in the LICENSE
- * file in the root directory of this source tree.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
+
 #ifndef HERMES_REGEX_REGEXBYTECODE_H
 #define HERMES_REGEX_REGEXBYTECODE_H
 
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/Support/Casting.h"
+#include "llvh/ADT/DenseMap.h"
+#include "llvh/Support/Casting.h"
 
 #include <cstdint>
 #include <vector>
@@ -42,21 +43,40 @@ struct Insn {
 struct GoalInsn : public Insn {};
 struct LeftAnchorInsn : public Insn {};
 struct RightAnchorInsn : public Insn {};
+struct MatchAnyInsn : public Insn {};
+struct U16MatchAnyInsn : public Insn {};
 struct MatchAnyButNewlineInsn : public Insn {};
+struct U16MatchAnyButNewlineInsn : public Insn {};
 struct MatchChar8Insn : public Insn {
   char c;
 };
+
+// Matches a 16 bit character without attempting to interpret surrogate pairs.
 struct MatchChar16Insn : public Insn {
   char16_t c;
+};
+
+// Matches a code point, decoding a surrogate pair if necessary.
+struct U16MatchChar32Insn : public Insn {
+  uint32_t c;
 };
 
 // Instructions for case-insensitive matching. c is already case-folded.
 struct MatchCharICase8Insn : public Insn {
   char c;
 };
+
+// Matches a 16 bit character without attempting to interpret surrogate pairs.
 struct MatchCharICase16Insn : public Insn {
   char16_t c;
 };
+
+// Matches a code point (case insensitive), decoding a surrogate pair if
+// necessary.
+struct U16MatchCharICase32Insn : public Insn {
+  uint32_t c;
+};
+
 struct AlternationInsn : public Insn {
   /// The primary branch is the Insn following the alternation, while the
   /// secondary branch is at the secondaryBranch jump target. Both branches have
@@ -69,20 +89,21 @@ struct Jump32Insn : public Insn {
   JumpTarget32 target;
 };
 
-/// A BracketRange represents an inclusive range of characters in a bracket,
-/// such as /[a-z]/. Singletons like /[a]/ are represented as the range a-a.
-struct BracketRange16 {
-  char16_t start;
-  char16_t end;
-};
 struct BackRefInsn : public Insn {
   uint16_t mexp;
 };
 
+/// A BracketRange represents an inclusive range of characters in a bracket,
+/// such as /[a-z]/. Singletons like /[a]/ are represented as the range a-a.
+struct BracketRange32 {
+  uint32_t start;
+  uint32_t end;
+};
+
 /// BracketInsn is a variable-width instruction. Each BracketInsn is followed by
-/// a sequence of BracketRange16 in the bytecode stream.
+/// a sequence of BracketRange32 in the bytecode stream.
 struct BracketInsn : public Insn {
-  /// Number of BracketRange16s following this instruction.
+  /// Number of BracketRange32s following this instruction.
   uint32_t rangeCount;
   /// Whether the bracket is negated (leading ^).
   uint8_t negate : 1;
@@ -95,11 +116,35 @@ struct BracketInsn : public Insn {
 
   /// \return the width of this instruction plus its bracket ranges.
   uint32_t totalWidth() const {
-    return sizeof(*this) + rangeCount * sizeof(BracketRange16);
+    return sizeof(*this) + rangeCount * sizeof(BracketRange32);
   }
 };
 
-// See BytecodeFileFormatTest for details about bit field layouts
+/// U16BracketInsn is a variant of BracketInsn used in Unicode regular
+/// expressions. It differs in that surrogate characters are decoded.
+struct U16BracketInsn : public BracketInsn {};
+
+struct MatchNChar8Insn : public Insn {
+  // number of 8-byte char following this instruction.
+  uint8_t charCount;
+
+  /// \return the width of this instruction plus its characters.
+  uint32_t totalWidth() const {
+    return sizeof(*this) + charCount * sizeof(char);
+  }
+};
+
+struct MatchNCharICase8Insn : public Insn {
+  // number of 8-byte char following this instruction.
+  uint8_t charCount;
+
+  /// \return the width of this instruction plus its characters.
+  uint32_t totalWidth() const {
+    return sizeof(*this) + charCount * sizeof(char);
+  }
+};
+
+// See BytecodeFileFormatTest for details about bit field layouts.
 static_assert(
     sizeof(BracketInsn) == 6,
     "BracketInsn should take up 6 byte total");
@@ -119,11 +164,13 @@ struct EndMarkedSubexpressionInsn : public Insn {
   uint16_t mexp;
 };
 
-/// A LookaheadInsn is immediately followed by bytecode for its contained
+/// A LookaroundInsn is immediately followed by bytecode for its contained
 /// expression. It has a jump target to its continuation.
-struct LookaheadInsn : public Insn {
+struct LookaroundInsn : public Insn {
   /// Whether we are inverted: (?!...) instead of (?=...).
   bool invert;
+  /// Whether we are forwards: (?=...) instead of (?<=...).
+  bool forwards;
   /// Constraints on what can match the contained expression.
   MatchConstraintSet constraints;
   // The subexpression marked regions we want to be able to backtrack.
@@ -149,8 +196,8 @@ struct BeginLoopInsn : public Insn {
   uint32_t max;
 
   /// Range of marked subexpressions enclosed by the loop, as [begin, end).
-  uint32_t mexpBegin;
-  uint32_t mexpEnd;
+  uint16_t mexpBegin;
+  uint16_t mexpEnd;
 
   /// Whether the loop is greedy (i.e. * instead of *?)
   bool greedy;
@@ -245,7 +292,8 @@ class RegexBytecodeStream {
   /// Whether our bytecode has been acquired.
   bool acquired_ = false;
 
-  /// Private type acting as a reallocation-safe pointer to an instruction.
+ public:
+  /// Type acting as a reallocation-safe pointer to an instruction.
   /// This stores a pointer to the vector and an offset, rather than a pointer
   /// into the vector contents.
   template <typename Instruction>
@@ -256,14 +304,13 @@ class RegexBytecodeStream {
    public:
     Instruction *operator->() {
       Insn *base = reinterpret_cast<Insn *>(&bytes_->at(offset_));
-      return llvm::cast<Instruction>(base);
+      return llvh::cast<Instruction>(base);
     }
 
     InstructionWrapper(std::vector<uint8_t> *bytes, uint32_t offset)
         : bytes_(bytes), offset_(offset) {}
   };
 
- public:
   /// Emit an instruction.
   /// \return a dereferenceable "pointer" to the instruction in the bytecode
   /// stream.
@@ -276,10 +323,15 @@ class RegexBytecodeStream {
     return InstructionWrapper<Instruction>(&bytes_, startSize);
   }
 
-  /// Emit a BracketRange16.
-  void emitBracketRange(BracketRange16 range) {
+  /// Emit a BracketRange32.
+  void emitBracketRange(BracketRange32 range) {
     const uint8_t *rangeBytes = reinterpret_cast<const uint8_t *>(&range);
     bytes_.insert(bytes_.end(), rangeBytes, rangeBytes + sizeof(range));
+  }
+
+  /// Emit a Char8 for use inside a MatchNChar8Insn or MatchNCharICase8Insn.
+  void emitChar8(char c) {
+    bytes_.push_back((uint8_t)c);
   }
 
   /// \return the current offset in the stream, which is where the next
@@ -305,7 +357,7 @@ class RegexBytecodeStream {
 } // namespace regex
 } // namespace hermes
 
-namespace llvm {
+namespace llvh {
 /// LLVM RTTI implementation for regex instructions. Rather than defining
 /// classof() for each instruction struct, which would require a lot of
 /// error-prone boilerplate, we take the Casting.h header's suggestion of
@@ -322,5 +374,5 @@ struct isa_impl<
     return val.opcode == hermes::regex::OpcodeFor<To>::value;
   }
 };
-} // namespace llvm
+} // namespace llvh
 #endif // HERMES_REGEX_REGEXBYTECODE_H
